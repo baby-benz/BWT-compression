@@ -1,0 +1,61 @@
+import algo.bwst.BWST;
+import algo.mtf.MTF;
+import algo.zrle.ZRLE;
+import helper.Constants;
+import helper.compressor.Compressor;
+import helper.compressor.Decompressor;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class EncodingDecodingIntegrationTest {
+    /*@TempDir
+    static Path sharedTempDir;*/
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "test_files\\bib", "test_files\\book1", "test_files\\book2", "test_files\\geo", "test_files\\news",
+            "test_files\\obj1", "test_files\\obj2", "test_files\\paper1", "test_files\\paper2", "test_files\\pic",
+            "test_files\\progc", "test_files\\progl", "test_files\\progp", "test_files\\trans"
+    })
+    void givenPathToFileToEncode_whenEncoded_thenTestPassed(String pathToFileToEncode) throws IOException {
+        Path fileToEncode = Path.of(pathToFileToEncode);
+
+        byte[] file = Files.readAllBytes(fileToEncode);
+
+        byte[] bwt = BWST.encode(file);
+
+        int[] mtf = MTF.encode(bwt);
+
+        int[] zrle = ZRLE.encode(mtf);
+
+        Compressor.compressAndWrite(fileToEncode.resolveSibling(fileToEncode.getFileName() + Constants.ENCODED_FILE_EXT), zrle);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "test_files\\bib", "test_files\\book1", "test_files\\book2", "test_files\\geo", "test_files\\news",
+            "test_files\\obj1", "test_files\\obj2", "test_files\\paper1", "test_files\\paper2", "test_files\\pic",
+            "test_files\\progc", "test_files\\progl", "test_files\\progp", "test_files\\trans"
+    })
+    void givenPathToFileToDecode_whenDecoded_thenTestPassed(String pathToFileToDecode) throws IOException {
+        Path fileToDecode = Path.of(pathToFileToDecode);
+
+        int[] decodedHuff = Decompressor.readAndDecompress(fileToDecode.resolveSibling(fileToDecode.getFileName() + Constants.ENCODED_FILE_EXT));
+
+        int[] decodedZrle = ZRLE.decode(decodedHuff);
+
+        byte[] decodedMtf = MTF.decode(decodedZrle);
+
+        BWST.decode(decodedMtf);
+
+        /*byte[] file = Files.readAllBytes(fileToDecode);
+
+        byte[] bwtDecode = BWST.decode(mtfDecode);
+
+        assertArrayEquals(file, bwtDecode);*/
+    }
+}
