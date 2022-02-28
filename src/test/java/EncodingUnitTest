@@ -1,0 +1,87 @@
+import algo.bwst.BWST;
+import algo.mtf.MTF;
+import algo.zrle.ZRLE;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
+public class EncodingUnitTest {
+    @ParameterizedTest
+    @MethodSource("bytesForBWST")
+    void givenBytesToEncode_whenBWSTEncode_thenActualResultEqualsExpected(byte[] bytesToEncode, byte[] expectedBWSTEncodedBytes) {
+        byte[] actualBWSTEncodedBytes = BWST.encode(bytesToEncode);
+        assertArrayEquals(expectedBWSTEncodedBytes, actualBWSTEncodedBytes);
+    }
+
+    @ParameterizedTest
+    @MethodSource("bytesForMTF")
+    void givenBytesToEncode_whenMTFEncode_thenActualResultEqualsExpected(byte[] bytesToEncode, int[] expectedMTFEncodedBytes) {
+        int[] actualMTFEncodedBytes = MTF.encode(bytesToEncode);
+        assertArrayEquals(expectedMTFEncodedBytes, actualMTFEncodedBytes);
+    }
+
+    @ParameterizedTest
+    @MethodSource("bytesForZRLE")
+    void givenBytesToEncode_whenZRLEEncode_thenActualResultEqualsExpected(int[] bytesToEncode, int[] expectedZRLEEncodedBytes) {
+        int[] actualZRLEEncodedBytes = ZRLE.encode(bytesToEncode);
+        assertArrayEquals(expectedZRLEEncodedBytes, actualZRLEEncodedBytes);
+    }
+
+    public static Stream<Arguments> bytesForBWST() {
+        return Stream.of(
+                Arguments.of(
+                        new byte[]{76, 111, 103, 105, 110, 58, 32, 105, 97, 110, 13, 10, 80, 97, 115, 115, 119, 111,
+                                114, 100, 58, 13, 10, 76, 97, 115, 116, 32, 108, 111, 103, 105, 110, 58, 32, 70, 114,
+                                105, 32, 65, 117, 103, 32, 50, 56, 32, 49, 51, 58, 52, 56, 58, 48, 51, 32, 102, 114, 111,
+                                109, 32, 118, 97, 120, 98, 13, 10, 84, 104, 105, 115, 32, 108, 111, 103, 105, 110, 58,
+                                32, 70, 114, 105, 32, 65, 117, 103, 32},
+                        new byte[]{32, 13, 13, 58, 98, 13, 103, 56, 103, 105, 105, 58, 58, 51, 110, 115, 116, 109, 58,
+                                32, 32, 48, 49, 58, 50, 52, 100, 110, 110, 56, 51, 58, 32, 32, 32, 32, 10, 110, 10, 10,
+                                105, 80, 76, 118, 120, 114, 32, 117, 117, 111, 111, 111, 84, 114, 114, 32, 103, 103, 103,
+                                104, 32, 32, 111, 97, 105, 105, 105, 108, 108, 76, 114, 119, 111, 70, 70, 102, 105, 97,
+                                97, 115, 115, 65, 65, 32, 115, 97}
+                )
+        );
+    }
+
+    public static Stream<Arguments> bytesForMTF() {
+        return Stream.of(
+                Arguments.of(
+                        new byte[]{32, 13, 13, 58, 98, 13, 103, 56, 103, 105, 105, 58, 58, 51, 110, 115, 116, 109, 58,
+                                32, 32, 48, 49, 58, 50, 52, 100, 110, 110, 56, 51, 58, 32, 32, 32, 32, 10, 110, 10, 10,
+                                105, 80, 76, 118, 120, 114, 32, 117, 117, 111, 111, 111, 84, 114, 114, 32, 103, 103, 103,
+                                104, 32, 32, 111, 97, 105, 105, 105, 108, 108, 76, 114, 119, 111, 70, 70, 102, 105, 97,
+                                97, 115, 115, 65, 65, 32, 115, 97},
+                        new int[]{32, 14, 0, 58, 98, 2, 103, 59, 1, 105, 0, 5, 0, 56, 110, 115, 116, 112, 5, 11, 0, 58,
+                                59, 3, 60, 61, 106, 10, 0, 14, 12, 6, 9, 0, 0, 0, 27, 5, 1, 0, 14, 88, 85, 118, 120, 118,
+                                8, 119, 0, 117, 0, 0, 97, 4, 0, 4, 23, 0, 0, 114, 2, 0, 5, 111, 12, 0, 0, 117, 0, 12, 8,
+                                120, 6, 90, 0, 116, 7, 8, 0, 29, 0, 87, 0, 11, 2, 3}
+                )
+        );
+    }
+
+    public static Stream<Arguments> bytesForZRLE() {
+        return Stream.of(
+                Arguments.of(
+                        new int[]{32, 14, 0, 58, 98, 2, 103, 59, 1, 105, 0, 5, 0, 56, 110, 115, 116, 112, 5, 11, 0, 58,
+                                59, 3, 60, 61, 106, 10, 0, 14, 12, 6, 9, 0, 0, 0, 27, 5, 1, 0, 14, 88, 85, 118, 120, 118,
+                                8, 119, 0, 117, 0, 0, 97, 4, 0, 4, 23, 0, 0, 114, 2, 0, 5, 111, 12, 0, 0, 117, 0, 12, 8,
+                                120, 6, 90, 0, 116, 7, 8, 0, 29, 0, 87, 0, 11, 2, 3},
+                        new int[]{33, 15, 0, 59, 99, 3, 104, 60, 2, 106, 0, 6, 0, 57, 111, 116, 117, 113, 6, 12, 0, 59,
+                                60, 4, 61, 62, 107, 11, 0, 15, 13, 7, 10, 0, 0, 28, 6, 2, 0, 15, 89, 86, 119, 121, 119,
+                                9, 120, 0, 118, 1, 98, 5, 0, 5, 24, 1, 115, 3, 0, 6, 112, 13, 1, 118, 0, 13, 9, 121, 7,
+                                91, 0, 117, 8, 9, 0, 30, 0, 88, 0, 12, 3, 4}
+                )
+        );
+    }
+
+    /*@ParameterizedTest
+    void givenBytesToEncode_whenHuffmanEncode_thenActualResultEqualsExpected(Path fileToRead, int[] expectedHuffmanEncodedBytes) throws IOException {
+        Compressor.compressAndWrite(fileName, mtf);
+        assertArrayEquals(mtf, decodeHuff);
+    }*/
+}
